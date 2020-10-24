@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
       {
         if (k <= j)
         {
-          sleep(200); //io time
+//          sleep(200); //io time
         }
         else
         {
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
           }
         }
       }
-    //   printf(1, "Process: %d Finished\n", j);
+      printf(1, "Process: %d Finished\n", j);
       exit();
     }
     else{

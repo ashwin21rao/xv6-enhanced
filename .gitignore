@@ -15,4 +15,4 @@ kernelmemfs
 mkfs
 .gdbinit
 .idea
-maker
+maker.sh
