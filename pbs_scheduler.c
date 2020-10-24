@@ -97,13 +97,26 @@ trap(struct trapframe *tf)
         exit();
 }
 
+int
+getminpriority()
+{
+    struct proc *p;
+    int min_priority_value = 150;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if (p->state != RUNNABLE)
+            continue;
+        if(p->priority < min_priority_value)
+            min_priority_value = p->priority;
+    }
+    return min_priority_value;
+}
+
 void
 scheduler(void)
 {
     struct proc *p;
     struct cpu *c = mycpu();
     c->proc = 0;
-    struct proc *priority_process; // process with highest priority (minimum value)
     int min_priority_value;
 
     for(;;){
@@ -111,35 +124,37 @@ scheduler(void)
         sti();
 
         acquire(&ptable.lock);
-        min_priority_value = 150;
-        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-            if (p->state != RUNNABLE)
-                continue;
-            if(p->priority < min_priority_value)
-            {
-                min_priority_value = p->priority;
-                priority_process = p;
-            }
-        }
+        min_priority_value = getminpriority();
         if(min_priority_value == 150)
         {
             release(&ptable.lock);
             continue; // no process is runnable, hence continue looking
         }
 
-        // Switch to chosen process.  It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
-        c->proc = priority_process;
-        switchuvm(priority_process);
-        priority_process->state = RUNNING;
-        cprintf("PBS: Switching to process %d\n", priority_process->pid);
-        swtch(&(c->scheduler), priority_process->context);
-        switchkvm();
+        // TODO: round robin between equal priorities
+        for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+            if (p->state != RUNNABLE)
+                continue;
+            if(p->priority == min_priority_value)
+            {
+                // Switch to chosen process.  It is the process's job
+                // to release ptable.lock and then reacquire it
+                // before jumping back to us.
+                c->proc = p;
+                switchuvm(p);
+                p->state = RUNNING;
+                cprintf("PBS: Switching to process %d\n", p->pid);
+                swtch(&(c->scheduler), p->context);
+                switchkvm();
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+                // Process is done running for now.
+                // It should have changed its p->state before coming back.
+                c->proc = 0;
+
+                if(getminpriority() < min_priority_value)
+                    break;
+            }
+        }
         release(&ptable.lock);
     }
 }
