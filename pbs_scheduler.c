@@ -86,8 +86,6 @@ trap(struct trapframe *tf)
     if(myproc() && myproc()->killed && (tf->cs&3) == DPL_USER)
         exit();
 
-    // FCFS IS NON-PREEMPTIVE HENCE WILL NOT RELINQUISH CPU ON TIMER INTERRUPT
-
     // Force process to give up CPU on clock tick.
     // If interrupts were on while locks held, would need to check nlock.
     if(myproc() && myproc()->state == RUNNING &&
