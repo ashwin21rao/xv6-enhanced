@@ -28,6 +28,24 @@ OBJS = \
 	vectors.o\
 	vm.o\
 
+# Choose scheduler
+ifndef SCHEDULER
+	OBJS += rr_scheduler.o
+endif
+ifeq ($(SCHEDULER), RR)
+	OBJS += rr_scheduler.o
+endif
+ifeq ($(SCHEDULER), FCFS)
+	OBJS += fsfs_scheduler.o
+endif
+ifeq ($(SCHEDULER), PBS)
+	OBJS += pbs_scheduler.o
+endif
+ifeq ($(SCHEDULER), MLFQ)
+	OBJS += mlfq_scheduler.o
+endif
+
+
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
 
@@ -182,6 +200,7 @@ UPROGS=\
 	_wc\
 	_zombie\
 	_time\
+	_benchmark\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
