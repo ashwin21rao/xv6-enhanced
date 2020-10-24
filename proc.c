@@ -89,6 +89,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
+  p->priority = 60; // default priority of process
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -581,4 +582,22 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+set_priority(int new_priority, int pid)
+{
+    struct proc *p;
+
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->pid == pid){
+            int old_pid = p->priority;
+            p->priority = new_priority;
+            release(&ptable.lock);
+            return old_pid;
+        }
+    }
+    release(&ptable.lock);
+    return -1;
 }

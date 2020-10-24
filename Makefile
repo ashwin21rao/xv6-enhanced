@@ -201,6 +201,7 @@ UPROGS=\
 	_zombie\
 	_time\
 	_benchmark\
+	_setpriority\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
