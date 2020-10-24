@@ -103,10 +103,10 @@ sys_waitx(void)
 
 int sys_set_priority(void)
 {
-    int *new_priority, *pid;
-    if(argptr(0, (char**)&new_priority, sizeof(int)) < 0)
+    int new_priority, pid;
+    if(argint(0, &new_priority) < 0)
         return -1;
-    if(argptr(1, (char**)&pid, sizeof(int)) < 0)
+    if(argint(1, &pid) < 0)
         return -1;
-    return set_priority(*new_priority, *pid);
+    return set_priority(new_priority, pid);
 }

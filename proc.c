@@ -592,10 +592,10 @@ set_priority(int new_priority, int pid)
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->pid == pid){
-            int old_pid = p->priority;
+            int old_priority = p->priority;
             p->priority = new_priority;
             release(&ptable.lock);
-            return old_pid;
+            return old_priority;
         }
     }
     release(&ptable.lock);

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
         printf(2, "Too many arguments\n");
         exit();
     }
-    set_priority(atoi(argv[1]), atoi(argv[2]));
+    int old_priority = set_priority(atoi(argv[1]), atoi(argv[2]));
+    printf(1, "DONE. OLD PRIORITY = %d\n", old_priority);
     exit();
 }
