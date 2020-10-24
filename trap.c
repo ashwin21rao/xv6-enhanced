@@ -51,6 +51,9 @@ trap(struct trapframe *tf)
     if(cpuid() == 0){
       acquire(&tickslock);
       ticks++;
+      // Update run time of running process which got interrupted by timer
+      if(myproc() && myproc()->state == RUNNING)
+        myproc()->rtime += 1;
       wakeup(&ticks);
       release(&tickslock);
     }
