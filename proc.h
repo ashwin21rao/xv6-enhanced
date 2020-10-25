@@ -52,6 +52,7 @@ struct proc {
   int ctime;                   // creation time of process
   int rtime;                   // run time of process
   int etime;                   // end time of process
+  int n_run;                   // number of times process was picked by scheduler
   int priority;                // priority of process (for PBS)
   int cur_q;                   // current queue in which the process is in (for MLFQ)
   int q_toe;                   // time of entry into the current queue

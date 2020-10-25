@@ -160,6 +160,7 @@ scheduler(void) {
             c->proc = sp;
             switchuvm(sp);
             sp->state = RUNNING;
+            sp->n_run++;
             cprintf("MLFQ: Switching to process %d in queue %d\n", sp->pid, sp->cur_q);
             swtch(&(c->scheduler), sp->context);
             switchkvm();

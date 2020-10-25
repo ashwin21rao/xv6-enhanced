@@ -89,6 +89,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
+  p->n_run = 0;
   p->priority = 60; // default priority of process
   p->cur_q = 0; // process starts at queue 0
   p->q_toe = ticks; // initialize queue entry time of process
@@ -596,7 +597,7 @@ int
 set_priority(int new_priority, int pid)
 {
     struct proc *p;
-
+//    cprintf("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->pid == pid){
@@ -608,4 +609,32 @@ set_priority(int new_priority, int pid)
     }
     release(&ptable.lock);
     return -1;
+}
+
+int
+procinfo()
+{
+    acquire(&ptable.lock);
+    cprintf("%s  %s  %s      %s  %s  %s  %s  %s   %s   %s   %s   %s\n",
+            "PID", "Priority", "State", "r_time", "w_time", "n_run", "cur_q", "q0", "q1", "q2", "q3", "q4");
+    char state[100];
+    for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        if(p->state == UNUSED)
+            continue;
+        if(p->state == EMBRYO)
+            safestrcpy(state, "EMBRYO  ", 10);
+        else if(p->state == SLEEPING)
+            safestrcpy(state, "SLEEPING", 10);
+        else if(p->state == RUNNABLE)
+            safestrcpy(state, "RUNNABLE", 10);
+        else if(p->state == RUNNING)
+            safestrcpy(state, "RUNNING ", 10);
+        else if(p->state == ZOMBIE)
+            safestrcpy(state, "ZOMBIE  ", 10);
+        cprintf("%d    %d        %s   %d       %d       %d      %d      %d    %d    %d    %d    %d\n",
+                p->pid, p->priority, state, p->rtime, ticks - p->q_toe, p->n_run, p->cur_q,
+                p->q0, p->q1, p->q2, p->q3, p-> q4);
+    }
+    release(&ptable.lock);
+    return 0;
 }
