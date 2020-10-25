@@ -170,8 +170,12 @@ scheduler(void) {
             c->proc = 0;
 
             // If process used entire time slice, move it down one level
+            // If process exited, it is removed from queue system
+            // If process blocked, it is pushed to end of the same queue
             if(sp->q_ticks == 0) {
-                if (sp->cur_q != 4)
+                if(sp->state == ZOMBIE)
+                    sp->cur_q = -1;
+                else if (sp->cur_q != 4)
                     sp->cur_q++;
             }
             // update time of entry into new queue (or same queue)
