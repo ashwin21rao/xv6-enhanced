@@ -90,6 +90,13 @@ found:
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
   p->priority = 60; // default priority of process
+  p->cur_q = 0; // process starts at queue 0
+  p->q_toe = ticks; // initialize queue entry time of process
+  p->q0 = 0;
+  p->q1 = 0;
+  p->q2 = 0;
+  p->q3 = 0;
+  p->q4 = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.

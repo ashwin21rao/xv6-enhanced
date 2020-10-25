@@ -108,31 +108,30 @@ trap(struct trapframe *tf) {
 }
 
 // helper function to get process at head of queue
-//struct proc *
-//getQueueSize(int q_num)
-//{
-//    struct proc *sp = 0;
-//    int min_q_toe = 2e9;
-//    for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-//        if(p->state != RUNNABLE)
-//            continue;
-//        if (p->cur_q == q_num) {
-//            //cprintf("Found one process in queue %d with pid %d\n", pr->cur_q, pr->pid);
-//            if (p->q_toe < min_q_toe) {
-//                min_q_toe = p->q_toe;
-//                sp = p;
-//            }
-//        }
-//    }
-//    return sp;
-//}
+struct proc *
+getFirstProcess(int q_num)
+{
+    struct proc *sp = 0;
+    int min_q_toe = 2e9; // minimum time of entry (process at head of that queue)
+    for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        if(p->state != RUNNABLE)
+            continue;
+        if (p->cur_q == q_num) {
+            //cprintf("Found one process in queue %d with pid %d\n", pr->cur_q, pr->pid);
+            if (p->q_toe < min_q_toe) {
+                min_q_toe = p->q_toe;
+                sp = p;
+            }
+        }
+    }
+    return sp;
+}
 
 void
 scheduler(void) {
     struct proc *sp; // process which will be scheduled
     struct cpu *c = mycpu();
     c->proc = 0;
-    int min_q_toe; // minimum time of entry (head of that queue)
 
     for (;;) {
         // Enable interrupts on this processor.
@@ -141,31 +140,21 @@ scheduler(void) {
         acquire(&ptable.lock);
         // Loop over queues from highest to lowest priority
         for (int i = 0; i <= 4; i++) {
-            min_q_toe = 2e9;
-            sp = 0;
-            for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-                if(p->state != RUNNABLE)
-                    continue;
-                if (p->cur_q == i) {
-                    //cprintf("Found one process in queue %d with pid %d\n", pr->cur_q, pr->pid);
-                    if (p->q_toe < min_q_toe) {
-                        min_q_toe = p->q_toe;
-                        sp = p;
-                    }
-                }
-            }
+            sp = getFirstProcess(i); // get process at head of queue
             // if no runnable process in the current priority queue, move down one level
-            if (sp == 0) {
+            if (sp == 0)
                 continue;
-            }
 
             int q_ticks = 1 << i; // number of ticks in time slice in queue i (1, 2, 4, 8, 16)
+            int blocked = 0;
 
-            // run chosen process for entire time slice or until it finishes
+            // run chosen process for entire time slice or until it relinquishes CPU
             for (int r = 0; r < q_ticks; r++) {
-                // process is done running
-                if(sp->state != RUNNABLE)
+                // process relinquished CPU before completing time slice (blocked or exited)
+                if(sp->state != RUNNABLE) {
+                    blocked = 1;
                     break;
+                }
 
                 // Switch to chosen process.  It is the process's job
                 // to release ptable.lock and then reacquire it
@@ -183,26 +172,32 @@ scheduler(void) {
                 c->proc = 0;
             }
 
-            // after process finishes time slice, move down one level
-            if (sp->cur_q != 4)
-                sp->cur_q++;
-            // update time of entry into new queue
+            // after process finishes time slice, move it down one level
+            if(blocked == 0) {
+                if (sp->cur_q != 4)
+                    sp->cur_q++;
+            }
+            // update time of entry into new queue (or same queue)
             sp->q_toe = ticks;
 
-            // aging of process: move up one level if it waits for too long in a queue
+            // aging of processes: move process up one level if it waits for too long in a queue (5 * time slice)
             int aged = 0;
             for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-                if((ticks - p->q_toe) >  5 * q_ticks){
+                if((ticks - p->q_toe) > 5 * (1 << p->cur_q)) {
                     if(p->cur_q > 0)
+                    {
                         p->cur_q--;
-                    p->q_toe = ticks;
-                    aged = 1;
+                        p->q_toe = ticks;
+                        aged = 1;
+                        cprintf("Process %d aged from %d to %d\n", p->pid, p->cur_q+1, p->cur_q);
+                    }
                 }
             }
 
-            // start from beginning (queue 0) to account for aged processes
             if(aged == 1)
-                i = -1;
+                i = -1; // start from beginning (queue 0) to account for aged processes
+            else
+                i--; // get next process at head of same queue
         }
         release(&ptable.lock);
     }
