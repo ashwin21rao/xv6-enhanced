@@ -168,6 +168,7 @@ scheduler(void) {
             // Process is done running for now.
             // It should have changed its p->state before coming back.
             c->proc = 0;
+            sp->ustime = ticks;
 
             // If process used entire time slice, move it down one level
             // If process exited, it is removed from queue system

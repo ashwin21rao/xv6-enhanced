@@ -89,6 +89,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
+  p->ustime = ticks; // initialize unschedule time
   p->n_run = 0;
   p->priority = 60; // default priority of process
   p->cur_q = 0; // process starts at queue 0
@@ -631,7 +632,8 @@ procinfo()
         else if(p->state == ZOMBIE)
             safestrcpy(state, "ZOMBIE  ", 10);
         cprintf("%d    %d        %s   %d       %d       %d      %d      %d    %d    %d    %d    %d\n",
-                p->pid, p->priority, state, p->rtime, ticks - p->q_toe, p->n_run, p->cur_q,
+                p->pid, p->priority, state, p->rtime,
+                (p->state == RUNNING) ? 0 : ticks - p->ustime, p->n_run, p->cur_q,
                 p->q0, p->q1, p->q2, p->q3, p-> q4);
     }
     release(&ptable.lock);
