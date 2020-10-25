@@ -29,15 +29,7 @@ There is a choice between the following 4 CPU scheduling algorithms:
    - Ex: ```time ls```
 
 2. ```ps```
-   - Prints details of all processes in the system, including:
-     - pid
-     - state (EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE)
-     - total run time
-     - number of times the process was run on a CPU
-     - time spent waiting to be run on a CPU
-     - priority (in case of PBS)
-     - current queue (in case of MLFQ)
-     - number of ticks received in each queue (in case of MLFQ)
+   - Prints details of all processes in the system.
 
 3. ```setPriority <new_priority> <pid>```
    - For a priority based scheduler, sets the priority of the process with process id ```pid``` to ```new_priority```. 
