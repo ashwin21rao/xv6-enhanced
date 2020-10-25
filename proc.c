@@ -92,6 +92,7 @@ found:
   p->priority = 60; // default priority of process
   p->cur_q = 0; // process starts at queue 0
   p->q_toe = ticks; // initialize queue entry time of process
+  p->q_ticks = 1; // processes in queue 0 run for 1 tick
   p->q0 = 0;
   p->q1 = 0;
   p->q2 = 0;

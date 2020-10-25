@@ -55,6 +55,7 @@ struct proc {
   int priority;                // priority of process (for PBS)
   int cur_q;                   // current queue in which the process is in (for MLFQ)
   int q_toe;                   // time of entry into the current queue
+  int q_ticks;                 // remaining number of ticks process should run in the current queue
   int q0;                      // number of ticks process received in queue 0
   int q1;                      // number of ticks process received in queue 1
   int q2;                      // number of ticks process received in queue 2

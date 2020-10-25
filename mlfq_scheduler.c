@@ -99,8 +99,14 @@ trap(struct trapframe *tf) {
     // Force process to give up CPU on clock tick.
     // If interrupts were on while locks held, would need to check nlock.
     if (myproc() && myproc()->state == RUNNING &&
-        tf->trapno == T_IRQ0 + IRQ_TIMER)
-        yield();
+        tf->trapno == T_IRQ0 + IRQ_TIMER) {
+
+        // yield CPU only after completion of time slice of process
+        myproc()->q_ticks--;
+        if(myproc()->q_ticks == 0)
+            yield();
+        cprintf("Process %d in queue %d not yielding\n", myproc()->pid, myproc()->cur_q);
+    }
 
     // Check if the process has been killed since we yielded
     if (myproc() && myproc()->killed && (tf->cs & 3) == DPL_USER)
@@ -117,7 +123,6 @@ getFirstProcess(int q_num)
         if(p->state != RUNNABLE)
             continue;
         if (p->cur_q == q_num) {
-            //cprintf("Found one process in queue %d with pid %d\n", pr->cur_q, pr->pid);
             if (p->q_toe < min_q_toe) {
                 min_q_toe = p->q_toe;
                 sp = p;
@@ -145,35 +150,26 @@ scheduler(void) {
             if (sp == 0)
                 continue;
 
-            int q_ticks = 1 << i; // number of ticks in time slice in queue i (1, 2, 4, 8, 16)
-            int blocked = 0;
+            // number of ticks in time slice in queue i (1, 2, 4, 8, 16)
+            sp->q_ticks= 1 << i;
 
-            // run chosen process for entire time slice or until it relinquishes CPU
-            for (int r = 0; r < q_ticks; r++) {
-                // process relinquished CPU before completing time slice (blocked or exited)
-                if(sp->state != RUNNABLE) {
-                    blocked = 1;
-                    break;
-                }
+            // Run chosen process for entire time slice or until it relinquishes CPU
+            // Switch to chosen process.  It is the process's job
+            // to release ptable.lock and then reacquire it
+            // before jumping back to us.
+            c->proc = sp;
+            switchuvm(sp);
+            sp->state = RUNNING;
+            cprintf("MLFQ: Switching to process %d in queue %d\n", sp->pid, sp->cur_q);
+            swtch(&(c->scheduler), sp->context);
+            switchkvm();
 
-                // Switch to chosen process.  It is the process's job
-                // to release ptable.lock and then reacquire it
-                // before jumping back to us.
-                c->proc = sp;
-                switchuvm(sp);
-                sp->state = RUNNING;
-                cprintf("MLFQ: Switching to process %d in queue %d\n", sp->pid, sp->cur_q);
-                swtch(&(c->scheduler), sp->context);
-                //cprintf("MLFQ: Back to scd!\n");
-                switchkvm();
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+            c->proc = 0;
 
-                // Process is done running for now.
-                // It should have changed its p->state before coming back.
-                c->proc = 0;
-            }
-
-            // after process finishes time slice, move it down one level
-            if(blocked == 0) {
+            // If process used entire time slice, move it down one level
+            if(sp->q_ticks == 0) {
                 if (sp->cur_q != 4)
                     sp->cur_q++;
             }
