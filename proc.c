@@ -597,7 +597,6 @@ int
 set_priority(int new_priority, int pid)
 {
     struct proc *p;
-//    cprintf("HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->pid == pid){
