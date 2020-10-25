@@ -136,6 +136,7 @@ scheduler(void)
         c->proc = first_process;
         switchuvm(first_process);
         first_process->state = RUNNING;
+        first_process->n_run++;
         cprintf("FCFS: Switching to process %d\n", first_process->pid);
         swtch(&(c->scheduler), first_process->context);
         switchkvm();
