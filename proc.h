@@ -53,6 +53,13 @@ struct proc {
   int rtime;                   // run time of process
   int etime;                   // end time of process
   int priority;                // priority of process (for PBS)
+  int cur_q;                   // current queue in which the process is in (for MLFQ)
+  int q_toe;                   // time of entry into the current queue
+  int q0;                      // number of ticks process received in queue 0
+  int q1;                      // number of ticks process received in queue 1
+  int q2;                      // number of ticks process received in queue 2
+  int q3;                      // number of ticks process received in queue 3
+  int q4;                      // number of ticks process received in queue 4
 };
 
 // Process memory is laid out contiguously, low addresses first:

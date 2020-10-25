@@ -99,6 +99,7 @@ trap(struct trapframe *tf)
         exit();
 }
 
+// FIRST COME FIRST SERVED (FCFS) scheduler
 void
 scheduler(void)
 {

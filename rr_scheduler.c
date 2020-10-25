@@ -14,6 +14,7 @@ struct {
     struct proc proc[NPROC];
 } ptable;
 
+
 // trap handler
 void
 trap(struct trapframe *tf)

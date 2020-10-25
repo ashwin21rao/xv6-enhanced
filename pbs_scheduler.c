@@ -97,6 +97,7 @@ trap(struct trapframe *tf)
         exit();
 }
 
+// helper function which returns minimum value of priority (highest priority)
 int
 getminpriority()
 {
@@ -111,6 +112,7 @@ getminpriority()
     return min_priority_value;
 }
 
+//  PRIORITY BASED (PBS) scheduler
 void
 scheduler(void)
 {
@@ -131,7 +133,7 @@ scheduler(void)
             continue; // no process is runnable, hence continue looking
         }
 
-        // TODO: round robin between equal priorities
+        // round robin between equal priorities
         for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
             if (p->state != RUNNABLE)
                 continue;
@@ -151,7 +153,7 @@ scheduler(void)
                 // It should have changed its p->state before coming back.
                 c->proc = 0;
 
-                if(getminpriority() < min_priority_value)
+                if(getminpriority() < min_priority_value) // preempt round robin for lower priority process
                     break;
             }
         }
