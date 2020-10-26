@@ -89,11 +89,11 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
-  p->ustime = ticks; // initialize unschedule time
   p->n_run = 0;
   p->priority = 60; // default priority of process
   p->cur_q = 0; // process starts at queue 0
-  p->q_toe = ticks; // initialize queue entry time of process
+  // initializing and updating q_toe is done when the process state becomes RUNNABLE (userinit, fork, yield, wakeup1)
+//  p->q_toe = ticks; // initialize queue entry time of process
   p->q_ticks = 1; // processes in queue 0 run for 1 tick
   p->q0 = 0;
   p->q1 = 0;
@@ -160,8 +160,9 @@ userinit(void)
   acquire(&ptable.lock);
 
   p->state = RUNNABLE;
+  p->q_toe = ticks; // initialize queue entry time of process
 
-  release(&ptable.lock);
+    release(&ptable.lock);
 }
 
 // Grow current process's memory by n bytes.
@@ -225,8 +226,9 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
+  np->q_toe = ticks; // initialize queue entry time of process
 
-  release(&ptable.lock);
+    release(&ptable.lock);
 
   return pid;
 }
@@ -448,6 +450,7 @@ yield(void)
 {
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
+  myproc()->q_toe = ticks; // update queue entry time of process
   sched();
   release(&ptable.lock);
 }
@@ -499,7 +502,7 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
-
+  p->q_toe = ticks; // update q_toe so that w_time = ticks - q_toe for a sleeping process
   sched();
 
   // Tidy up.
@@ -522,7 +525,10 @@ wakeup1(void *chan)
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan)
-      p->state = RUNNABLE;
+    {
+        p->state = RUNNABLE;
+        p->q_toe = ticks; // update queue entry time of process
+    }
 }
 
 // Wake up all processes sleeping on chan.
@@ -633,7 +639,7 @@ procinfo()
             safestrcpy(state, "ZOMBIE  ", 10);
         cprintf("%d    %d        %s   %d       %d       %d      %d      %d    %d    %d    %d    %d\n",
                 p->pid, p->priority, state, p->rtime,
-                (p->state == RUNNING) ? 0 : ticks - p->ustime, p->n_run, p->cur_q,
+                (p->state == RUNNING) ? 0 : ticks - p->q_toe, p->n_run, p->cur_q,
                 p->q0, p->q1, p->q2, p->q3, p-> q4);
     }
     release(&ptable.lock);

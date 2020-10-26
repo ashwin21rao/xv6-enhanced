@@ -167,24 +167,26 @@ scheduler(void) {
 
             // Process is done running for now.
             // It should have changed its p->state before coming back.
+            // p->q_toe is also updated before coming back
             c->proc = 0;
-            sp->ustime = ticks;
 
             // If process used entire time slice, move it down one level
             // If process exited, it is removed from queue system
-            // If process blocked, it is pushed to end of the same queue
+            // If process blocked, it is pushed to end of the same queue once it wakes up
             if(sp->q_ticks == 0) {
                 if(sp->state == ZOMBIE)
                     sp->cur_q = -1;
                 else if (sp->cur_q != 4)
                     sp->cur_q++;
             }
-            // update time of entry into new queue (or same queue)
-            sp->q_toe = ticks;
+            // update time of entry into new queue (or same queue) - this is taken care of before control returns to scheduler
+//            sp->q_toe = ticks;
 
             // aging of processes: move process up one level if it waits for too long in a queue (5 * time slice)
             int aged = 0;
             for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+                if(p->state != RUNNABLE)
+                    continue;
                 if((ticks - p->q_toe) > 5 * (1 << p->cur_q)) {
                     if(p->cur_q > 0)
                     {
