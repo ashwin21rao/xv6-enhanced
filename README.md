@@ -49,9 +49,11 @@ There is a choice between the following 4 CPU scheduling algorithms:
 - This makes use of the ```procinfo``` system call which prints out the details of every process in the operating 
   system, obtained directly from the process structure.
 - ```n_run``` is incremented just before a process starts running on a CPU.
-- ```w_time``` is the amount of time the process has been waiting for a CPU. it is calculated using 
-  ```w_time = ticks - ustime``` where ```ticks``` is the current time and ```ustime``` is the most recent time the 
-  process was preempted from running.
+- ```w_time``` is the amount of time the process has been waiting:
+  - For a CPU to run on, if the process is runnable.
+  - For it to be woken up, if the process is sleeping.
+- ```wtime``` is calculated using ```w_time = ticks - q_toe``` where ```ticks``` is the current time and ```ustime``` is the most recent time the 
+  process state was changed to ```RUNNABLE``` or ```SLEEPING```. 
 
 ### ```FCFS``` scheduler
 
@@ -80,12 +82,14 @@ There is a choice between the following 4 CPU scheduling algorithms:
   the value of ```q_ticks``` becomes ```0```, it relinquishes control of the CPU.
 - If the value of ```q_ticks``` after the process yields the CPU is ```0```, it means that the process used up its 
   entire time slice. Else, the process either exited or blocked before its time slice completed.
-- A process which finished its time slice in a queue (except the lowest queue) is moved down to the end of the next queue by incrementing 
-  ```cur_q``` and resetting ```q_toe``` to be equal to ```ticks```. 
-- For a process which did not use up its entire time slice, or for a process in the lowest queue, only ```q_toe``` is reset to ```ticks``` which moves it 
-  to the end of the same queue. Hence Round Robin is automatically implemented for the lowest queue.
+- A process which finished its time slice in a queue (except the lowest queue) is moved down to the end of the next 
+  queue by incrementing  ```cur_q``` and resetting ```q_toe``` to be equal to ```ticks```. 
+- For a process which did not use up its entire time slice, ```q_toe``` is reset to ```ticks``` when the process 
+  becomes runnable again, hence moving it to the end of the same queue once it wakes up.
+- For a process in the lowest queue which used up its time slice, ```cur_q``` remains the same and ```q_toe``` is reset.
+  Hence Round Robin is automatically implemented for the lowest queue.
 - After a process uses up its time slice, we loop over all processes in the system and implement aging. If a process
-  has waited for more than ```5 * time slice```, it is moved to the end of the previous queue 
+  has waited for the CPU for more than ```5 * time slice``` ticks, it is moved to the end of the previous queue 
   (with higher priority) by decrementing ```cur_q``` and resetting ```q_toe``` to ```ticks```.
 - If at least one process aged, we start looping again from the head of the highest priority (```0```), to account for
   possible new entries in higher priority queues. Else, we schedule the next process at the head of the current queue.
