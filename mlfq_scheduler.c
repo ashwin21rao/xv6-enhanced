@@ -173,10 +173,10 @@ scheduler(void) {
             // If process used entire time slice, move it down one level
             // If process exited, it is removed from queue system
             // If process blocked, it is pushed to end of the same queue once it wakes up
+            if(sp->state == ZOMBIE)
+                sp->cur_q = -1;
             if(sp->q_ticks == 0) {
-                if(sp->state == ZOMBIE)
-                    sp->cur_q = -1;
-                else if (sp->cur_q != 4)
+                if (sp->cur_q != 4)
                     sp->cur_q++;
             }
             // update time of entry into new queue (or same queue) - this is taken care of before control returns to scheduler
