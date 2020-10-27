@@ -89,6 +89,9 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->ctime = ticks; // initialize creation time
+  p->rtime = 0;
+  p->iotime = 0;
+  p->etime = 0;
   p->n_run = 0;
   p->priority = 60; // default priority of process
   p->cur_q = 0; // process starts at queue 0
@@ -353,10 +356,11 @@ waitx(int *wtime, int *rtime)
                 p->name[0] = 0;
                 p->killed = 0;
                 p->state = UNUSED;
-                *wtime = p->etime - p->rtime - p->ctime; // wait time = end time - run time - creation time
+                *wtime = p->etime - p->rtime - p->iotime - p->ctime; // wait time = end time - run time - io time - creation time
                 *rtime = p->rtime; // store run time
                 p->ctime = 0;
                 p->rtime = 0;
+                p->iotime = 0;
                 p->etime = 0;
                 release(&ptable.lock);
                 return pid;

@@ -41,8 +41,10 @@ There is a choice between the following 4 CPU scheduling algorithms:
   
 - The variable ```rtime``` stores the total runtime of the process. This is incremented after each clock tick the 
   process runs (on timer interrupt).
+- The variable ```iotime``` stores the total time the process spends waiting for input/output. This is incremented 
+  after each clock tick the process sleeps (on timer interrupt).
 - The total waiting time of the process is calculated using the formula:  
-  ```total_wait_time = end_time - total_run_time - creation_time```
+  ```total_wait_time = end_time - total_run_time - total_io_time - creation_time```
   
 ### ```ps``` user program
 

@@ -34,18 +34,24 @@ trap(struct trapframe *tf) {
                 acquire(&tickslock);
                 ticks++;
                 // Update run time and queue ticks of running process which got interrupted by timer
-                if (myproc() && myproc()->state == RUNNING) {
-                    myproc()->rtime += 1;
-                    if (myproc()->cur_q == 0)
-                        myproc()->q0++;
-                    else if (myproc()->cur_q == 1)
-                        myproc()->q1++;
-                    else if (myproc()->cur_q == 2)
-                        myproc()->q2++;
-                    else if (myproc()->cur_q == 3)
-                        myproc()->q3++;
-                    else if (myproc()->cur_q == 4)
-                        myproc()->q4++;
+                if(myproc())
+                {
+                    if(myproc()->state == RUNNING)
+                    {
+                        myproc()->rtime++;
+                        if (myproc()->cur_q == 0)
+                            myproc()->q0++;
+                        else if (myproc()->cur_q == 1)
+                            myproc()->q1++;
+                        else if (myproc()->cur_q == 2)
+                            myproc()->q2++;
+                        else if (myproc()->cur_q == 3)
+                            myproc()->q3++;
+                        else if (myproc()->cur_q == 4)
+                            myproc()->q4++;
+                    }
+                    else if(myproc()->state == SLEEPING)
+                        myproc()->iotime++;
                 }
                 wakeup(&ticks);
                 release(&tickslock);

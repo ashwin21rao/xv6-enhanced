@@ -51,6 +51,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   int ctime;                   // creation time of process
   int rtime;                   // run time of process
+  int iotime;                  // total time spent doing io
   int etime;                   // end time of process
   int n_run;                   // number of times process was picked by scheduler
   int priority;                // priority of process (for PBS)
