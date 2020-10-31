@@ -111,7 +111,7 @@ trap(struct trapframe *tf) {
         myproc()->q_ticks--;
         if(myproc()->q_ticks == 0)
             yield();
-        cprintf("Process %d in queue %d not yielding\n", myproc()->pid, myproc()->cur_q);
+//        cprintf("Process %d in queue %d not yielding\n", myproc()->pid, myproc()->cur_q);
     }
 
     // Check if the process has been killed since we yielded
@@ -167,7 +167,7 @@ scheduler(void) {
             switchuvm(sp);
             sp->state = RUNNING;
             sp->n_run++;
-            cprintf("MLFQ: Switching to process %d in queue %d\n", sp->pid, sp->cur_q);
+//            cprintf("MLFQ: Switching to process %d in queue %d\n", sp->pid, sp->cur_q);
             swtch(&(c->scheduler), sp->context);
             switchkvm();
 
@@ -199,7 +199,7 @@ scheduler(void) {
                         p->cur_q--;
                         p->q_toe = ticks;
                         aged = 1;
-                        cprintf("Process %d aged from %d to %d\n", p->pid, p->cur_q+1, p->cur_q);
+//                        cprintf("Process %d aged from %d to %d\n", p->pid, p->cur_q+1, p->cur_q);
                     }
                 }
             }

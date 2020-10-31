@@ -151,7 +151,7 @@ scheduler(void)
                 switchuvm(p);
                 p->state = RUNNING;
                 p->n_run++;
-                cprintf("PBS: Switching to process %d\n", p->pid);
+//                cprintf("PBS: Switching to process %d\n", p->pid);
                 swtch(&(c->scheduler), p->context);
                 switchkvm();
 
