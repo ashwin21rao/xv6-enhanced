@@ -4,7 +4,6 @@
 int number_of_processes = 50;
 
 int main(int argc, char *argv[]) {
-    //int parent_pid = getpid();
     for (int i = 0; i < number_of_processes; i++) {
         int pid = fork();
         if (pid < 0) {
@@ -50,8 +49,7 @@ int main(int argc, char *argv[]) {
             printf(2, "Benchmark: %d Exited, Category : %d, Total : %d\n", i, i % 4, total);
             exit();
         } else {
-            set_priority(100 - (20 + i) % 2,
-                         pid); // will only matter for PBS, comment it out if not implemented yet (better priorty for more IO intensive jobs)
+            set_priority(100 - (20 + i) % 2, pid); // will only matter for PBS, comment it out if not implemented yet (better priorty for more IO intensive jobs)
         }
     }
 
