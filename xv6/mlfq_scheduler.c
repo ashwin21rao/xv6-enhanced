@@ -189,12 +189,12 @@ scheduler(void) {
             // update time of entry into new queue (or same queue) - this is taken care of before control returns to scheduler
 //            sp->q_toe = ticks;
 
-            // aging of processes: move process up one level if it waits for too long in a queue (2 ^ (time slice + 5))
+            // aging of processes: move process up one level if it waits for too long in a queue (2 ^ (queue number + 4))
             int aged = 0;
             for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
                 if(p->state != RUNNABLE)
                     continue;
-                if((ticks - p->q_toe) > (1 << (p->cur_q + 5))) {
+                if((ticks - p->q_toe) > (1 << (p->cur_q + 4))) {
                     if(p->cur_q > 0)
                     {
                         p->cur_q--;
@@ -206,10 +206,10 @@ scheduler(void) {
             }
 
 //             // data collection for graph
-//             if(ticks - prev_ticks > 2) {
-//                 cprintf("%d, ", ticks);
+//             if(ticks - prev_ticks > 0){
+//                 cprintf("%d,", ticks);
 //                 for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-//                     cprintf("%d, ", p->cur_q);
+//                     cprintf("%d,", p->cur_q);
 //                 cprintf("\n");
 //                 prev_ticks = ticks;
 //             }

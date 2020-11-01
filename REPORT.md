@@ -54,7 +54,7 @@
 - For a process in the lowest queue which used up its time slice, ```cur_q``` remains the same and ```q_toe``` is reset.
   Hence Round Robin is automatically implemented for the lowest queue.
 - After a process uses up its time slice, we loop over all processes in the system and implement aging. If a process
-  has waited for the CPU for more than ```2 ^ (5 + time slice)``` ticks, it is moved to the end of the previous queue 
+  has waited for the CPU for more than ```2 ^ (4 + cur_q)``` ticks, it is moved to the end of the previous queue 
   (with higher priority) by decrementing ```cur_q``` and resetting ```q_toe``` to ```ticks```.
 - If at least one process aged, we start looping again from the head of the highest priority (```0```), to account for
   possible new entries in higher priority queues. Else, we schedule the next process at the head of the current queue.
@@ -92,5 +92,15 @@ The benchmark program spawns a total of 40 processes, 10 of each of the followin
 ### ```MLFQ``` scheduler
 - Total ticks: 2749
 - Processes are scheduled based on their current priority queue.
+- A processes may be promoted to a higher priority queue if it waits for the CPU for too long.
 
-![Alt text](pyscripts/graph.jpg)
+#### Graphs showing behaviour of ```MLFQ``` scheduler
+
+1. Benchmark with 20 processes (no aging occurs)
+![Alt text](pyscripts/graph20.jpg)
+
+2. Benchmark with 40 processes (some aging occurs)
+![Alt text](pyscripts/graph40.jpg)
+
+3. Benchmark with 50 processes (significant aging occurs)
+![Alt text](pyscripts/graph50.jpg)
