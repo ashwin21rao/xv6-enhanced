@@ -18,9 +18,10 @@ There is a choice between the following 4 CPU scheduling algorithms:
 ## BUILDING AND RUNNING xv6
 
 - Install the QEMU PC simulator.
+- ```cd``` into the xv6 folder.
 - Run ```make qemu SCHEDULER=<scheduler type>``` where ```scheduler type``` is one of ```RR```, ```FCFS```, ```PBS``` 
   and ```MLFQ```. If not specified, the Round Robin scheduler is used.
-- For more details look at the [original README](README_original).
+- For more details look at the [original README](xv6/README).
 
 
 ## ADDED USER COMMANDS

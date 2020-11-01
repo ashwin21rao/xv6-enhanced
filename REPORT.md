@@ -54,7 +54,7 @@
 - For a process in the lowest queue which used up its time slice, ```cur_q``` remains the same and ```q_toe``` is reset.
   Hence Round Robin is automatically implemented for the lowest queue.
 - After a process uses up its time slice, we loop over all processes in the system and implement aging. If a process
-  has waited for the CPU for more than ```5 * time slice``` ticks, it is moved to the end of the previous queue 
+  has waited for the CPU for more than ```2 ^ (5 + time slice)``` ticks, it is moved to the end of the previous queue 
   (with higher priority) by decrementing ```cur_q``` and resetting ```q_toe``` to ```ticks```.
 - If at least one process aged, we start looping again from the head of the highest priority (```0```), to account for
   possible new entries in higher priority queues. Else, we schedule the next process at the head of the current queue.
@@ -67,28 +67,28 @@
 
 ## PERFORMANCE OF SCHEDULING ALGORITHMS
 
-The performance of the 4 scheduling algorithms has been tested on the [benchmark program](benchmark.c).  
-The total time taken is found by running ```time benchmark```.
+The performance of the 4 scheduling algorithms has been tested on the [benchmark program](xv6/benchmark.c).  
+The total time taken is found by running ```time benchmark```.  
+
+The benchmark program spawns a total of 40 processes, 10 of each of the following types:
+- Pure CPU
+- CPU followed by IO
+- IO followed by CPU
+- Pure IO
 
 ### ```RR``` scheduler (default)
-- Total ticks: 3748
-- Order of completion of processes:
-  - IO bound
-  - IO followed by CPU, CPU followed by IO 
-  - CPU bound
+- Total ticks: 2522
+- Processes are executed in a Round Robin manner.  
   
 ### ```FCFS``` scheduler
-- Total ticks: 4327
-- Processes are completed in the same order in which they were scheduled.
-  
+- Total ticks: 2828
+- Processes are run to completion after being scheduled.
+
 ### ```PBS``` scheduler
-- Total ticks: 3826
-- Odd processes have higher priority than even processes and hence are executed first.
+- Total ticks: 2406
+- Odd processes have higher priority than even processes and hence are scheduled first.
 - Round Robin between odd processes and then between even processes.
 
 ### ```MLFQ``` scheduler
-- Total ticks: 3869
-- Order of completion of processes:
-  - IO bound
-  - IO followed by CPU, CPU followed by IO
-  - CPU bound
+- Total ticks: 2749
+- Processes are scheduled based on their current priority queue.
