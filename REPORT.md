@@ -93,4 +93,4 @@ The benchmark program spawns a total of 40 processes, 10 of each of the followin
 - Total ticks: 2749
 - Processes are scheduled based on their current priority queue.
 
-![Alt text](pyscripts/MLFQgraph.jpg)
+![Alt text](pyscripts/graph.jpg)
