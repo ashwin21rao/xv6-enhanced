@@ -205,7 +205,7 @@ scheduler(void) {
                 }
             }
 
-//             // data collection for graph
+//             // data collection for graph (copy paste output into data.csv file)
 //             if(ticks - prev_ticks > 0){
 //                 cprintf("%d,", ticks);
 //                 for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++)
