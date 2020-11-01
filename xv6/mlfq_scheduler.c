@@ -194,7 +194,7 @@ scheduler(void) {
             for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
                 if(p->state != RUNNABLE)
                     continue;
-                if((ticks - p->q_toe) > 1 << (p->cur_q + 5)) {
+                if((ticks - p->q_toe) > (1 << (p->cur_q + 5))) {
                     if(p->cur_q > 0)
                     {
                         p->cur_q--;
@@ -205,8 +205,8 @@ scheduler(void) {
                 }
             }
 
-            // data collection for graph
-//             if(ticks - prev_ticks > 50) {
+//             // data collection for graph
+//             if(ticks - prev_ticks > 2) {
 //                 cprintf("%d, ", ticks);
 //                 for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++)
 //                     cprintf("%d, ", p->cur_q);

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
                 }
                 sleep(500);
             }
-            printf(2, "Benchmark: %d Exited (category: %d)\n", i, i % 4);
+//            printf(2, "Benchmark: %d Exited (category: %d)\n", i, i % 4);
             exit();
         } else {
             set_priority(100 - (20 + i) % 2, pid); // will only matter for PBS, comment it out if not implemented yet (better priority for more IO intensive jobs)
