@@ -1,8 +1,8 @@
 ## INTRODUCTION
 
 This project builds upon the [xv6 operating system](https://github.com/mit-pdos/xv6-public) developed by MIT.  
-Look at the [project report](REPORT.md) for implementation details of additional features and comparison of performance of 
-different scheduling algorithms.
+Look at the [project report](REPORT.md) for implementation details of additional features and comparison of performance 
+of different scheduling algorithms.
 
 The following additional features have been implemented:
 - System calls: ```waitx```, ```procinfo```

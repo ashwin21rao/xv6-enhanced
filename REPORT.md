@@ -17,7 +17,7 @@
 - ```w_time``` is the amount of time the process has been waiting:
   - For a CPU to run on, if the process is runnable.
   - For it to be woken up, if the process is sleeping.
-- ```wtime``` is calculated using ```w_time = ticks - q_toe``` where ```ticks``` is the current time and ```ustime``` is the most recent time the 
+- ```wtime``` is calculated using ```w_time = ticks - q_toe``` where ```ticks``` is the current time and ```q_toe``` is the most recent time the 
   process state was changed to ```RUNNABLE``` or ```SLEEPING```. 
 
 ### ```FCFS``` scheduler
