@@ -1,11 +1,14 @@
 ## IMPLEMENTATION OF ADDITIONAL FEATURES
 
 ### ```waitx``` system call
-  
+
+- The variable ```ctime``` stores the creation time of the process. It is set to ```ticks``` when the process is
+  initialized.
 - The variable ```rtime``` stores the total runtime of the process. This is incremented after each clock tick the 
   process runs (on timer interrupt).
 - The variable ```iotime``` stores the total time the process spends waiting for input/output. This is incremented 
   after each clock tick the process sleeps (on timer interrupt).
+- The variable ```etime``` stores the end time of the process. It is set to ```ticks``` when the process exits.
 - The total waiting time of the process is calculated using the formula:  
   ```total_wait_time = end_time - total_run_time - total_io_time - creation_time```
   
@@ -17,7 +20,7 @@
 - ```w_time``` is the amount of time the process has been waiting:
   - For a CPU to run on, if the process is runnable.
   - For it to be woken up, if the process is sleeping.
-- ```wtime``` is calculated using ```w_time = ticks - q_toe``` where ```ticks``` is the current time and ```q_toe``` is the most recent time the 
+- ```w_time``` is calculated using ```w_time = ticks - q_toe``` where ```ticks``` is the current time and ```q_toe``` is the most recent time the 
   process state was changed to ```RUNNABLE``` or ```SLEEPING```. 
 
 ### ```FCFS``` scheduler
