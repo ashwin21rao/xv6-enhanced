@@ -190,7 +190,6 @@ scheduler(void) {
 //            sp->q_toe = ticks;
 
             // aging of processes: move process up one level if it waits for too long in a queue (2 ^ (queue number + 4))
-            int aged = 0;
             for (struct proc *p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
                 if(p->state != RUNNABLE)
                     continue;
@@ -199,7 +198,6 @@ scheduler(void) {
                     {
                         p->cur_q--;
                         p->q_toe = ticks;
-                        aged = 1;
 //                        cprintf("Process %d aged from %d to %d\n", p->pid, p->cur_q+1, p->cur_q);
                     }
                 }
@@ -214,10 +212,7 @@ scheduler(void) {
 //                 prev_ticks = ticks;
 //             }
 
-            if(aged == 1)
-                i = -1; // start from beginning (queue 0) to account for aged processes
-            else
-                i--; // get next process at head of same queue
+            i = -1; // start from beginning (queue 0) to account for aged or new processes
         }
         release(&ptable.lock);
     }

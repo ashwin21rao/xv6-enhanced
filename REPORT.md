@@ -56,10 +56,10 @@
   becomes runnable again, hence moving it to the end of the same queue once it wakes up.
 - For a process in the lowest queue which used up its time slice, ```cur_q``` remains the same and ```q_toe``` is reset.
   Hence Round Robin is automatically implemented for the lowest queue.
-- After a process uses up its time slice, we loop over all processes in the system and implement aging. If a process
-  has waited for the CPU for more than ```2 ^ (4 + cur_q)``` ticks, it is moved to the end of the previous queue 
-  (with higher priority) by decrementing ```cur_q``` and resetting ```q_toe``` to ```ticks```.
-- If at least one process aged, we start looping again from the head of the highest priority (```0```), to account for
+- After a process uses up its time slice or blocks/exits, we loop over all runnable processes in the system and 
+  implement aging. If a process has waited for the CPU for more than ```2 ^ (4 + cur_q)``` ticks, it is moved to the 
+  end of the previous queue (with higher priority) by decrementing ```cur_q``` and resetting ```q_toe``` to ```ticks```.
+- After aging, we start looping again from the head of the highest priority (```0```), to account for
   possible new entries in higher priority queues. Else, we schedule the next process at the head of the current queue.
 - Once the current queue from which we are scheduling processes becomes empty, we begin scheduling processes from the 
   head of the next (lower priority) queue.
